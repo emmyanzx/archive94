@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 import { supabaseServer } from "../../../lib/supabase/server";
 import { supabaseAdmin } from "../../../lib/supabase/admin";
 import { sendOrderEmail } from "../../../lib/mailgun";
@@ -14,8 +15,11 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Check the form fields and try again." }, { status: 400 });
-  const sb = await supabaseServer();
-  const { data: { user } } = await sb.auth.getUser();
+  const token = req.headers.get("authorization")?.replace("Bearer ", "");
+  const sb = token
+    ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { headers: { Authorization: `Bearer ${token}` } } })
+    : await supabaseServer();
+  const { data: { user } } = token ? await sb.auth.getUser(token) : await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "Sign in to place an order." }, { status: 401 });
   const b = parsed.data;
   const { data, error } = await sb.rpc("place_order", { p_ids: b.ids, p_name: b.name, p_phone: b.phone, p_address: b.address, p_notes: b.notes ?? null });
