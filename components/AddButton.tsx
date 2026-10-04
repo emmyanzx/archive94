@@ -11,6 +11,7 @@ export default function AddButton({ id }: { id: string }) {
     const t = createClient().from("cart_items");
     (on ? t.delete().eq("product_id", id) : t.insert({ product_id: id })).then(() => {});
     setOn(!on);
+    window.dispatchEvent(new Event("a94cart"));
   }
   return <button onClick={toggle} className={`px-3 py-2 text-sm font-semibold border-2 border-ink transition active:scale-95 motion-reduce:transition-none ${on ? "bg-ink text-paper" : "hover:bg-tag"}`}>{on ? "In your cart" : "Add to cart"}</button>;
 }

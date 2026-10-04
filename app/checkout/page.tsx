@@ -24,7 +24,7 @@ export default function Checkout() {
       body: JSON.stringify({ ids: items.map((i) => i.id), name: f.get("name"), phone: f.get("phone"), address: f.get("address"), notes: f.get("notes") || undefined, method: f.get("method") }) });
     const j = await res.json(); setBusy(false);
     if (!res.ok) return setErr(j.error);
-    localStorage.removeItem("a94cart"); if (j.url) { location.href = j.url; return; } setDone(j.number);
+    localStorage.removeItem("a94cart"); window.dispatchEvent(new Event("a94cart")); if (j.url) { location.href = j.url; return; } setDone(j.number);
   }
   if (done) return <main className="px-5 py-8 max-w-xl mx-auto"><h1 className="text-3xl font-black">Order {done} placed</h1><p className="mt-2">We emailed your confirmation. You pay on delivery.</p></main>;
   if (!items.length) return <main className="px-5 py-8 max-w-xl mx-auto"><h1 className="text-3xl font-black">Your cart is empty</h1><p className="mt-2">Pick a piece from the archive.</p></main>;

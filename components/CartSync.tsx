@@ -13,6 +13,7 @@ export default function CartSync() {
       const missing = all.filter((id) => !remote.includes(id));
       if (missing.length) await sb.from("cart_items").insert(missing.map((product_id) => ({ product_id })));
       localStorage.setItem("a94cart", JSON.stringify(all));
+      window.dispatchEvent(new Event("a94cart"));
     })();
   }, []);
   return null;
