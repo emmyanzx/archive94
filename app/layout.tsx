@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Archivo } from "next/font/google";
 import Link from "next/link";
-import AuthButton from "../components/AuthButton";
+import AccountMenu from "../components/AccountMenu";
 import CartLink from "../components/CartLink";
 import Footer from "../components/Footer";
 import CartSync from "../components/CartSync";
@@ -18,11 +18,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b-2 border-ink">
         <Link href="/" className="text-2xl font-black tracking-tight">Archive94</Link>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <Link href="/about" className="hidden sm:inline font-semibold underline">About</Link>
+          <Link href="/about" className="font-semibold underline">About</Link>
           <CartLink />
-          {user && <Link href="/orders" className="hidden sm:inline font-semibold underline">My orders</Link>}
-          {me?.is_admin && <Link href="/admin" className="font-semibold underline">Admin</Link>}
-          <AuthButton email={user?.email} />
+                              <AccountMenu email={user?.email} isAdmin={!!me?.is_admin} />
         </nav>
       </header>
       <div className="flex-1">{children}</div>
