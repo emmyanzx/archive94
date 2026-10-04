@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import AuthButton from "../../components/AuthButton";
 import { createClient } from "../../lib/supabase/client";
 type P = { id: string; name: string; size: string; price: number };
-const field = "w-full border-2 border-ink bg-transparent px-3 py-2";
+const field = "w-full min-h-11 border-2 border-ink bg-transparent px-3 py-2";
 export default function Checkout() {
   const [items, setItems] = useState<P[]>([]);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -35,10 +35,10 @@ export default function Checkout() {
         <li className="flex justify-between py-2 font-bold"><span>Total</span><span>₦{total.toLocaleString("en-NG")}</span></li></ul>
       {signedIn === false ? <div className="mt-6"><p className="mb-3">Sign in to place your order.</p><AuthButton next="/checkout" /></div> : (
         <form onSubmit={submit} className="mt-6 grid gap-3">
-          <input name="name" required placeholder="Full name" className={field} />
-          <input name="phone" required placeholder="Phone number" className={field} />
-          <textarea name="address" required placeholder="Delivery address" className={field} />
-          <textarea name="notes" placeholder="Notes (optional)" className={field} />
+          <label className="grid gap-1 font-semibold">Full name<input name="name" required autoComplete="name" className={field} /></label>
+          <label className="grid gap-1 font-semibold">Phone number<input name="phone" type="tel" inputMode="tel" required autoComplete="tel" className={field} /></label>
+          <label className="grid gap-1 font-semibold">Delivery address<textarea name="address" required autoComplete="street-address" rows={3} className={field} /></label>
+          <label className="grid gap-1 font-semibold">Notes (optional)<textarea name="notes" rows={2} className={field} /></label>
           <fieldset className="grid gap-2"><legend className="font-bold">Payment</legend>
             <label><input type="radio" name="method" value="paystack" defaultChecked /> Pay online now (card, bank transfer, USSD via Paystack)</label>
             <label><input type="radio" name="method" value="cod" /> Pay on delivery</label></fieldset>

@@ -13,5 +13,5 @@ export default function AddButton({ id }: { id: string }) {
     setOn(!on);
     window.dispatchEvent(new Event("a94cart"));
   }
-  return <button onClick={toggle} className={`px-3 py-2 text-sm font-semibold border-2 border-ink transition active:scale-95 motion-reduce:transition-none ${on ? "bg-ink text-paper" : "hover:bg-tag"}`}>{on ? "In your cart" : "Add to cart"}</button>;
+  return <button onClick={toggle} className={`px-4 min-h-11 text-sm font-semibold border-2 border-ink transition active:scale-95 motion-reduce:transition-none ${on ? "bg-ink text-paper" : "hover:bg-tag"}`}>{on ? "In your cart" : "Add to cart"}</button>;
 }

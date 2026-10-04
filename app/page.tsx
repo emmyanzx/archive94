@@ -6,7 +6,7 @@ import { supabaseServer } from "../lib/supabase/server";
 import { no, naira } from "../lib/format";
 export const dynamic = "force-dynamic";
 const uniq = (a: (string | null)[]) => [...new Set(a.filter(Boolean) as string[])].sort();
-const sel = "border-2 border-ink bg-transparent px-2 py-2";
+const sel = "min-h-11 border-2 border-ink bg-transparent px-2";
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const q = await searchParams;
   const { data, error } = await (await supabaseServer()).from("products").select("*").order("created_at", { ascending: false });
@@ -36,7 +36,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           <select name="sort" defaultValue={q.sort ?? ""} aria-label="Sort" className={sel}>
             <option value="">Newest</option><option value="low">Price, low to high</option><option value="high">Price, high to low</option>
           </select>
-          <button className="bg-ink text-paper px-4 py-2 font-semibold hover:bg-denim">Filter</button>
+          <button className="bg-ink text-paper px-4 min-h-11 font-semibold hover:bg-denim">Filter</button>
           <Link href="/" className="underline font-semibold">Clear</Link>
         </form>
         {error && <p className="mt-4 font-bold text-red-700">{error.message}</p>}
