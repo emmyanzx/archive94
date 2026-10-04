@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import AuthButton from "../../components/AuthButton";
 import { createClient } from "../../lib/supabase/client";
 type P = { id: string; name: string; size: string; price: number };
-const field = "w-full min-h-11 border-2 border-ink bg-transparent px-3 py-2";
+const field = "w-full border-2 border-ink bg-transparent px-3 py-2";
 export default function Checkout() {
   const [items, setItems] = useState<P[]>([]);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState("");
+  const [geo, setGeo] = useState("");
   useEffect(() => {
     const sb = createClient();
     const ids: string[] = JSON.parse(localStorage.getItem("a94cart") || "[]");
@@ -17,6 +18,19 @@ export default function Checkout() {
     sb.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
   }, []);
   const total = items.reduce((s, i) => s + i.price, 0);
+  function locate() {
+    if (!navigator.geolocation) return setGeo("Your browser can't share its location.");
+    setGeo("Finding your location...");
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const r = await fetch(`/api/postcode?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+      const j = await r.json();
+      if (!r.ok || !j.found) return setGeo(j.error ?? "No postcode found. Type your address instead.");
+      const el = document.getElementById("address") as HTMLTextAreaElement;
+      const base = (j.address ?? el.value.split("\nPostcode:")[0]).trim();
+      el.value = `${base}${base ? "\n" : ""}Postcode: ${j.display}`;
+      setGeo(`Added postcode ${j.display}. Check the address before ordering.`);
+    }, () => setGeo("Location permission denied. Type your address instead."), { enableHighAccuracy: true, timeout: 10000 });
+  }
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setBusy(true); setErr("");
     const f = new FormData(e.currentTarget);
@@ -35,10 +49,12 @@ export default function Checkout() {
         <li className="flex justify-between py-2 font-bold"><span>Total</span><span>₦{total.toLocaleString("en-NG")}</span></li></ul>
       {signedIn === false ? <div className="mt-6"><p className="mb-3">Sign in to place your order.</p><AuthButton next="/checkout" /></div> : (
         <form onSubmit={submit} className="mt-6 grid gap-3">
-          <label className="grid gap-1 font-semibold">Full name<input name="name" required autoComplete="name" className={field} /></label>
-          <label className="grid gap-1 font-semibold">Phone number<input name="phone" type="tel" inputMode="tel" required autoComplete="tel" className={field} /></label>
-          <label className="grid gap-1 font-semibold">Delivery address<textarea name="address" required autoComplete="street-address" rows={3} className={field} /></label>
-          <label className="grid gap-1 font-semibold">Notes (optional)<textarea name="notes" rows={2} className={field} /></label>
+          <input name="name" required placeholder="Full name" className={field} />
+          <input name="phone" required placeholder="Phone number" className={field} />
+          <textarea id="address" name="address" required placeholder="Delivery address" className={field} />
+          <button type="button" onClick={locate} className="justify-self-start underline font-semibold min-h-11">Use my current location</button>
+          <p role="status" className="text-sm -mt-2">{geo}</p>
+          <textarea name="notes" placeholder="Notes (optional)" className={field} />
           <fieldset className="grid gap-2"><legend className="font-bold">Payment</legend>
             <label><input type="radio" name="method" value="paystack" defaultChecked /> Pay online now (card, bank transfer, USSD via Paystack)</label>
             <label><input type="radio" name="method" value="cod" /> Pay on delivery</label></fieldset>
