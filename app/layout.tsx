@@ -15,7 +15,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" data-scroll-behavior="smooth"><body className={`${font.className} min-h-screen flex flex-col`}>
       {user && <CartSync />}
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b-2 border-ink">
+     <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b-2 border-ink">
         <Link href="/" className="text-2xl font-black tracking-tight">Archive94</Link>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <Link href="/about" className="font-semibold underline">About</Link>
