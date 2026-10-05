@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { supabaseServer } from "../../../lib/supabase/server";
 import { supabaseAdmin } from "../../../lib/supabase/admin";
 import { sendOrderEmail } from "../../../lib/mailgun";
+import { allow } from "../../../lib/ratelimit";
 const Body = z.object({
   ids: z.array(z.string().uuid()).min(1).max(20),
   name: z.string().trim().min(2).max(100),
@@ -21,6 +22,8 @@ export async function POST(req: Request) {
     : await supabaseServer();
   const { data: { user } } = token ? await sb.auth.getUser(token) : await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "Sign in to place an order." }, { status: 401 });
+  if (!(await allow(`checkout:${user.id}`, 5, 600)))
+    return NextResponse.json({ error: "Too many order attempts. Try again in a few minutes." }, { status: 429, headers: { "Retry-After": "600" } });
   const b = parsed.data;
   const { data, error } = await sb.rpc("place_order", { p_ids: b.ids, p_name: b.name, p_phone: b.phone, p_address: b.address, p_notes: b.notes ?? null });
   if (error) {

@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase/server";
+import { allow } from "../../../lib/ratelimit";
 export async function GET(req: Request) {
   const { data: { user } } = await (await supabaseServer()).auth.getUser();
   if (!user) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
+  if (!(await allow(`postcode:${user.id}`, 20, 600)))
+    return NextResponse.json({ error: "Too many lookups. Try again in a few minutes." }, { status: 429 });
   const sp = new URL(req.url).searchParams;
   const lat = Number(sp.get("lat")), lng = Number(sp.get("lng"));
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
