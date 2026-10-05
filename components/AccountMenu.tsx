@@ -31,7 +31,7 @@ export default function AccountMenu({ email, isAdmin }: { email?: string | null;
               <p className="px-4 py-3 text-sm border-b-2 border-ink truncate" title={email}>Signed in as <b>{email}</b></p>
               <Link href="/orders" onClick={close} className={row}>My orders</Link>
               {isAdmin && <Link href="/admin" onClick={close} className={row}>Admin</Link>}
-              <button onClick={async () => { await sb.auth.signOut(); location.reload(); }} className={`${row} border-t-2 border-ink`}>Sign out</button>
+<button onClick={async () => { await sb.auth.signOut(); localStorage.removeItem("a94cart"); location.reload(); }} className={`${row} border-t-2 border-ink`}>Sign out</button>
             </>
           ) : (
             <div className="p-4 grid gap-3">

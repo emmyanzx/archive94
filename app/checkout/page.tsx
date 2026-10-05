@@ -14,7 +14,15 @@ export default function Checkout() {
   useEffect(() => {
     const sb = createClient();
     const ids: string[] = JSON.parse(localStorage.getItem("a94cart") || "[]");
-    if (ids.length) sb.from("products").select("id,name,size,price").in("id", ids).gt("stock", 0).then(({ data }) => setItems(data ?? []));
+if (ids.length) sb.from("products").select("id,name,size,price").in("id", ids).gt("stock", 0).then(({ data }) => {
+  const ok = (data ?? []).map((p) => p.id as string);
+  setItems(data ?? []);
+  if (ok.length !== ids.length) {
+    localStorage.setItem("a94cart", JSON.stringify(ok));
+    window.dispatchEvent(new Event("a94cart"));
+    sb.from("cart_items").delete().in("product_id", ids.filter((i) => !ok.includes(i))).then(() => {});
+  }
+});
     sb.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
   }, []);
   const total = items.reduce((s, i) => s + i.price, 0);
