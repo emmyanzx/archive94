@@ -11,6 +11,7 @@ export default function Footer() {
           <Link href="/about" className={a}>About</Link>
           <Link href="/orders" className={a}>My orders</Link>
           <Link href="/checkout" className={a}>Cart</Link>
+          <Link href="/download" className={a}>Get the app</Link>
         </nav>
         <div className="grid gap-2 content-start">
           <p className="font-bold">Contact</p>
